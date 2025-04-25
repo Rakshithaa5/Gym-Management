@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Member List</h2>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>Date of Birth</th>
+        <th>Address</th>
+        <th>Membership</th>
+    </tr>
+    {% for member in members %}
+    <tr>
+        <td>{{ member.member_id }}</td>
+        <td>{{ member.user_id }}</td>
+        <td>{{ member.date_of_birth }}</td>
+        <td>{{ member.address }}</td>
+        <td>{{ member.membership_id }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{{ url_for('add_member') }}">Add New Member</a>
+<a href="{{ url_for('add_member') }}">Add New Member</a>
+
+{% endblock %}

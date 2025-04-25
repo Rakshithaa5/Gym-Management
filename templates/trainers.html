@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Trainers{% endblock %}
+
+{% block header %}
+    <!-- Large Left-Aligned Heading with Emoji in Black Color -->
+    <div class="container">
+        <h1 class="text-left text-dark mb-5" style="font-size: 3.5rem; font-weight: bold; color: black;">
+            TRAINERS
+        </h1>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {% if trainers %}
+                {% for trainer in trainers %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <!-- Trainer Card with Hover Effects -->
+                        <div class="card shadow-lg rounded-lg border-light trainer-card hover-zoom">
+                            <!-- Ensure the image URL is handled correctly -->
+                            <img src="{{ url_for('static', filename='uploads/' + trainer.image_url) if trainer.image_url else url_for('static', filename='images/default-trainer.jpg') }}" 
+                                 class="card-img-top trainer-image" 
+                                 alt="{{ trainer.trainer_name }}" 
+                                 onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default-trainer.jpg') }}'">
+                            <div class="card-body">
+                                <h5 class="card-title text-center text-primary">{{ trainer.trainer_name }}</h5>
+                                <p><strong>Email:</strong> <a href="mailto:{{ trainer.email }}" class="text-decoration-none">{{ trainer.email }}</a></p>
+                                <p><strong>Experience:</strong> {{ trainer.experience }} years</p>
+                                <p><strong>Specialization:</strong> {{ trainer.specialization }}</p>
+                                <p class="bio-cell" title="{{ trainer.bio }}"><strong>Bio:</strong> {{ trainer.bio }}</p>
+
+                                <!-- Action buttons with a more elegant design -->
+                                <div class="d-flex justify-content-between mt-3">
+                                    <a href="{{ url_for('edit_trainer', trainer_id=trainer.user_id) }}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="mailto:{{ trainer.email }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-envelope"></i> Contact
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info col-12">
+                    No trainers found. Would you like to <a href="{{ url_for('add_user') }}" class="alert-link">add a trainer</a>?
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+<style>
+    /* Card Hover Effect */
+    .trainer-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Zoom-in Image Effect */
+    .trainer-card.hover-zoom .card-img-top {
+        transition: transform 0.3s ease;
+    }
+
+    .trainer-card.hover-zoom:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    /* Styling for Trainer Image */
+    .trainer-image {
+        height: 250px;
+        object-fit: cover;
+        border-radius: 0.25rem;
+    }
+
+    /* Small Tweaks to Text */
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .bio-cell {
+        font-size: 0.9rem;
+        color: #666;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 220px;
+    }
+
+    /* Button Styles */
+    .btn-warning, .btn-primary {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-warning:hover, .btn-primary:hover {
+        opacity: 0.85;
+    }
+</style>

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Background Wrapper -->
+<div class="bg-image-wrapper d-flex justify-content-center align-items-start">
+
+    <!-- Main Content Box -->
+    <div class="container py-5">
+        <div class="bg-overlay p-4 p-md-5 rounded shadow-lg" style="max-width: 1000px; margin: auto;">
+
+            <!-- Back to Home -->
+            <div class="mb-3">
+                <a href="{{ url_for('home') }}" class="btn btn-outline-secondary rounded-pill px-3 shadow-sm">
+                    ← Back to Home
+                </a>
+            </div>
+
+            <!-- Header + Add Button -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-dark fw-bold m-0">🏋️ Members</h2>
+              
+            </div>
+
+            <!-- Members Table -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #1d8cf8, #3358f4);">
+                    <h5 class="mb-0 fw-semibold">Current Gym Members</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>DOB</th>
+                                    <th>Address</th>
+                                    <th>Membership</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in members %}
+                                <tr>
+                                    <td>{{ member.user_name }}</td>
+                                    <td>{{ member.email }}</td>
+                                    <td><span class="badge bg-warning text-dark">{{ member.role }}</span></td>
+                                    <td>{{ member.date_of_birth }}</td>
+                                    <td>{{ member.address }}</td>
+                                    <td>
+                                        {% if member.membership_type %}
+                                            <span class="badge bg-success">{{ member.membership_type }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">None</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ url_for('edit_member', member_id=member.member_id) }}"
+                                           class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                            ✏️ Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <em>No members found. Add a member to get started!</em>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Styling -->
+<style>
+    .bg-image-wrapper {
+        background-image: url('{{ url_for("static", filename="images/gym-members-bg.png") }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        min-height: 100vh;
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    .bg-overlay {
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    .card-header {
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.5em 0.7em;
+    }
+
+    @media (max-width: 768px) {
+        .bg-overlay {
+            padding: 2rem !important;
+        }
+
+        .table th, .table td {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}

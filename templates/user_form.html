@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ action }} User</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="container mt-5">
+
+    <h2 class="mb-4">{{ action }} User</h2>
+
+    <!-- Flash message display (for success or error) -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="alert alert-info" role="alert">
+            {{ messages[0] }}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control form-control-lg" name="name" id="name" value="{{ user.name or '' }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control form-control-lg" name="email" id="email" value="{{ user.email or '' }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            <input type="text" class="form-control form-control-lg" name="phone" id="phone" value="{{ user.phone or '' }}" required
+                   pattern="\d{10}" title="Phone number should be 10 digits">
+        </div>
+
+        <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <select class="form-select form-select-lg" name="role" id="role" required>
+                <option value="">-- Select Role --</option>
+                <option value="Member" {% if user.role == 'Member' %}selected{% endif %}>Member</option>
+                <option value="Trainer" {% if user.role == 'Trainer' %}selected{% endif %}>Trainer</option>
+                <option value="Admin" {% if user.role == 'Admin' %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary btn-lg">{{ action }} User</button>
+            <a href="{{ url_for('list_users') }}" class="btn btn-secondary btn-lg">Cancel</a>
+        </div>
+    </form>
+
+</body>
+
+</html>

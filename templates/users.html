@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<!-- Background Wrapper -->
+<div class="bg-image-wrapper d-flex justify-content-center align-items-start">
+
+    <!-- Content Box -->
+    <div class="content-box container py-5">
+        <div class="bg-overlay px-4 py-5 px-md-5 rounded shadow-lg mx-auto" style="max-width: 960px;">
+
+            <!-- Back to Home -->
+            <div class="mb-3">
+                <a href="{{ url_for('home') }}" class="btn btn-light border shadow-sm rounded-pill px-3">
+                    ← Back to Home
+                </a>
+            </div>
+
+            <!-- Page Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <h2 class="text-dark fw-bold mb-3 mb-md-0">👥 Users</h2> <!-- Changed text-primary to text-dark -->
+    <a href="{{ url_for('add_user') }}" class="btn btn-success px-4 rounded-pill shadow-sm">
+        ➕ Add User
+    </a>
+</div>
+
+
+            <!-- Users Table -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header text-white fw-semibold fs-5"
+                     style="background: linear-gradient(135deg, #0d6efd, #6610f2);">
+                    List of Registered Users
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 10%;">ID</th>
+                                    <th style="width: 25%;">Name</th>
+                                    <th style="width: 25%;">Email</th>
+                                    <th style="width: 20%;">Role</th>  <!-- Added Role column -->
+                                    <th style="width: 20%;" class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td class="text-muted">{{ user.user_id }}</td>
+                                    <td class="fw-medium">{{ user.name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.role }}</td>  <!-- Display role -->
+                                    <td class="text-center">
+                                        <form action="{{ url_for('delete_user', user_id=user.user_id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                                🗑️ Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <em>No users found. Add one to get started!</em>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Styling -->
+<style>
+    .bg-image-wrapper {
+        background-image: url('{{ url_for("static", filename="images/gym-treadmill-bg.png") }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        min-height: 100vh;
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    .bg-overlay {
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+
+    .fw-medium {
+        font-weight: 500;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .table td,
+    .table th {
+        vertical-align: middle;
+    }
+
+    @media (max-width: 768px) {
+        .bg-overlay {
+            padding: 2rem !important;
+        }
+
+        .card-header {
+            font-size: 1rem;
+        }
+
+        .table th, .table td {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}

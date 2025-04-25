@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ action }} Member</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        h1 { text-align: center; }
+    </style>
+</head>
+<body>
+
+    <h1>{{ action }} Member</h1>
+
+    <div class="form-container">
+        <form method="POST">
+            <div>
+                <label for="user_id">Select User:</label>
+                <select name="user_id" required>
+                    {% for user in users %}
+                        <option value="{{ user.user_id }}" {% if user.user_id == member.user_id %}selected{% endif %}>{{ user.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="date_of_birth">Date of Birth:</label>
+                <input type="date" name="date_of_birth" value="{{ member.date_of_birth }}" required>
+            </div>
+
+            <div>
+                <label for="address">Address:</label>
+                <textarea name="address" required>{{ member.address }}</textarea>
+            </div>
+
+            <div>
+                <label for="membership_id">Membership Type:</label>
+                <select name="membership_id">
+                    {% for membership in memberships %}
+                        <option value="{{ membership.membership_id }}" {% if membership.membership_id == member.membership_id %}selected{% endif %}>
+                            {{ membership.type }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit">{{ action }} Member</button>
+        </form>
+    </div>
+
+</body>
+</html>

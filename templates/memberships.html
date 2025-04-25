@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Memberships{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-lg border-0">
+        <!-- Card Header -->
+        <div class="card-header bg-primary text-white rounded-top">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Current Gym Members</h4>
+                <a href="{{ url_for('list_members') }}" class="btn btn-light btn-sm rounded-pill">
+                    <i class="bi bi-arrow-left-circle"></i> Back to Members
+                </a>
+            </div>
+        </div>
+        
+        <!-- Card Body with Content -->
+        <div class="card-body">
+            <!-- MEMBERSHIPS Heading -->
+            <h3 class="text-start mb-4" style="font-weight: bold; color: #333;">
+                🏅 MEMBERSHIPS
+            </h3>
+            
+            <!-- Search and Filter Section -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <form method="GET" class="input-group">
+                        <input type="text" name="search" class="form-control form-control-lg" placeholder="Search members..." value="{{ search_query }}">
+                        <button class="btn btn-outline-primary btn-lg" type="submit">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                        {% if search_query %}
+                        <a href="{{ url_for('list_memberships') }}" class="btn btn-outline-secondary ms-2 btn-lg">
+                            <i class="bi bi-x-circle"></i> Clear
+                        </a>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <div class="col-md-6">
+                    <form method="GET" class="input-group">
+                        <select name="membership_filter" class="form-select form-select-lg" onchange="this.form.submit()">
+                            <option value="">All Membership Types</option>
+                            {% for membership in memberships %}
+                            <option value="{{ membership.membership_id }}" 
+                                {% if membership_filter|string == membership.membership_id|string %}selected{% endif %}>
+                                {{ membership.type }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if membership_filter %}
+                        <a href="{{ url_for('list_memberships') }}" class="btn btn-outline-secondary ms-2 btn-lg">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <!-- Members Table -->
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered table-striped align-middle mb-0">
+                    <thead class="table-light" style="background: linear-gradient(135deg, #0d6efd, #6610f2);">
+                        <tr>
+                            <th>Member ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Membership</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if members %}
+                            {% for member in members %}
+                            <tr>
+                                <td>{{ member.member_id }}</td>
+                                <td>{{ member.name_full }}</td>
+                                <td>
+                                    <span class="badge bg-warning">{{ member.role }}</span>
+                                </td>
+                                <td>
+                                    {% if member.membership_id %}
+                                        {% for membership in memberships %}
+                                            {% if membership.membership_id == member.membership_id %}
+                                                <span class="badge bg-success">{{ membership.type }}</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="badge bg-secondary">None</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="POST" class="d-flex">
+                                        <select name="membership_type" class="form-select form-select-sm me-2">
+                                            <option value="">Select...</option>
+                                            {% for membership in memberships %}
+                                            <option value="{{ membership.membership_id }}"
+                                                {% if member.membership_id == membership.membership_id %}selected{% endif %}>
+                                                {{ membership.type }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                        <input type="hidden" name="member_id" value="{{ member.member_id }}">
+                                        <button type="submit" class="btn btn-sm btn-primary rounded-pill">
+                                            <i class="bi bi-pencil-square"></i> Update
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No members found</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Background Image -->
+<style>
+   /* Container styling with new clean background image */
+/* Container styling with background image */
+.container {
+    background-image: url('{{ url_for("static", filename="images/gym-members-ng.png") }}');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    padding-top: 3rem;
+}
+
+/* Card Styling with reduced opacity */
+.card {
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly reduced opacity for the card */
+}
+
+/* Card Header Styling */
+.card-header {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+}
+
+/* Table Cells Styling with reduced opacity */
+.table td, .table th {
+    vertical-align: middle;
+    background-color: rgba(255, 255, 255, 0.95); /* Reduced opacity for table cells */
+}
+
+/* Hover Effect for Table Rows */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1); /* Slight blue hover effect */
+}
+
+/* Table Header Styling */
+.table thead {
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    color: white;
+}
+
+/* Table Border Styling */
+.table-bordered td, .table-bordered th {
+    border-color: #dee2e6;
+}
+
+/* Badge Styling */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 1em;
+    border-radius: 20px;
+}
+
+.badge.bg-success {
+    background-color: #28a745;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .form-select, .form-control, .btn {
+        font-size: 0.9rem;
+    }
+
+    .table td, .table th {
+        font-size: 0.85rem;
+    }
+}
+
+
+</style>
+{% endblock %}

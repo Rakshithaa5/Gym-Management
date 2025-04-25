@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Add Payment{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="background-image: url('{{ url_for('static', filename='images/gym-equipment-background.png') }}'); background-size: cover; background-position: center; min-height: 100vh;">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold m-0">💳 Record a Payment</h2>
+        <a href="{{ url_for('list_payments') }}" class="btn btn-outline-secondary rounded-pill px-3">
+            ← Back to Payments
+        </a>
+    </div>
+
+    <!-- Payment Form Card -->
+    <div class="card shadow-sm border-0" style="background-color: rgba(255, 255, 255, 0.95);"> <!-- Reduced opacity for the card -->
+        <div class="card-body">
+            <form method="POST">
+
+                <!-- Select Member -->
+                <div class="mb-3">
+                    <label for="member_id" class="form-label">Select Member:</label>
+                    <select name="member_id" id="member_id" class="form-select rounded-pill" required>
+                        <option value="" disabled selected>Select a member</option>
+                        {% for member in members %}
+                            <option value="{{ member.member_id }}">{{ member.name_full }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Amount -->
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount (₹):</label>
+                    <input type="number" name="amount" id="amount" class="form-control rounded-pill" step="0.01" required>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="mb-4">
+                    <label for="method" class="form-label">Payment Method:</label>
+                    <select name="method" id="method" class="form-select rounded-pill" required>
+                        <option value="Cash">Cash</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Net Banking">Net Banking</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100 rounded-pill shadow-sm">
+                    💾 Record Payment
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- Custom Styling -->
+<style>
+    .form-label {
+        font-weight: 500;
+    }
+
+    .form-control,
+    .form-select {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #0d6efd;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    .card {
+        border-radius: 0.75rem;
+    }
+</style>
+
+{% endblock %}

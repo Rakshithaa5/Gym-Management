@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Tracking{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="background-image: url('{{ url_for('static', filename='images/gym-header.png') }}'); background-size: cover; background-position: center; min-height: 100vh;">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">📅 Attendance Records</h2>
+        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary rounded-pill px-3">
+            ← Back to Home
+        </a>
+    </div>
+
+    <!-- Search Filters -->
+    <form method="GET" action="{{ url_for('list_attendance') }}" class="mb-4">
+        <div class="row g-2">
+            <div class="col-md-5">
+                <input type="text" class="form-control shadow-sm" name="search" placeholder="🔍 Search by Name"
+                       value="{{ search_query }}" autocomplete="off">
+            </div>
+            <div class="col-md-5">
+                <input type="text" class="form-control shadow-sm" name="date" placeholder="📆 YYYY-MM-DD"
+                       value="{{ date_filter }}" autocomplete="off">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100 shadow-sm" type="submit">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Attendance Table Card -->
+    <div class="card border-0 shadow-sm" style="background-color: rgba(255, 255, 255, 0.9);"> <!-- Reduced opacity -->
+        <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #1d8cf8, #3358f4);">
+            <h5 class="mb-0 fw-semibold"> Check-ins</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="background-color: rgba(255, 255, 255, 0.9);"> <!-- Reduced opacity -->
+                    <thead class="table-light">
+                        <tr>
+                            <th>Member Name</th>
+                            <th>Check-in Time</th>
+                            <th>Check-out Time</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in attendance_records %}
+                        <tr>
+                            <td>{{ record.member_name }}</td>
+                            <td>{{ record.check_in }}</td>
+                            <td>
+                                {% if record.check_out %}
+                                    {{ record.check_out }}
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Still In</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if not record.check_out %}
+                                <form method="POST" action="{{ url_for('check_out', attendance_id=record.attendance_id) }}">
+                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">
+                                        ✅ Checkout
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted">Checked Out</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <em>No attendance records found for the selected filters.</em>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Optional Custom Styles -->
+<style>
+    .card-header {
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.4em 0.6em;
+    }
+
+    .btn-success:hover {
+        background-color: #198754;
+    }
+
+    /* Table Styling */
+    .table td, .table th {
+        vertical-align: middle;
+        padding: 12px 15px;  /* Added padding for better spacing */
+    }
+
+    /* Header Styling */
+    .table thead {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    /* Hover Effect for Table Rows */
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.1); /* Highlight row on hover */
+    }
+</style>
+
+{% endblock %}
