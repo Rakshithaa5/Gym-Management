@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for,flash
-
 import MySQLdb
 from MySQLdb import cursors
 import config
@@ -41,11 +40,11 @@ def get_db_connection():
         cursorclass=MySQLdb.cursors.DictCursor
     )
 
-@app.route('/')
+@app.route('/') #homepage route
 def index():
     return render_template('home.html')
 @app.route('/users')
-def list_users():
+def list_users(): #list users
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -61,88 +60,120 @@ def list_users():
 
     return render_template('users.html', users=users)  # Pass the users data to the template
 @app.route('/users/add', methods=['GET', 'POST'])
-def add_user():
+def add_user():  # add user
     if request.method == 'POST':
-        name_full = request.form['name_full']
-        email = request.form['email']
-        role = request.form['role']
-        
+        name_full = request.form.get('name_full', '').strip()
+        email = request.form.get('email', '').strip()
+        role = request.form.get('role', '').strip()
 
-        # Handle the 'member' role case
+        # Basic validation for required fields for all users
+        if not name_full:
+            flash("Full name is required.", "danger")
+            return redirect(url_for('add_user'))
+        if not email:
+            flash("Email is required.", "danger")
+            return redirect(url_for('add_user'))
+        if not role:
+            flash("Role is required.", "danger")
+            return redirect(url_for('add_user'))
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if email already exists in Users table
+        cursor.execute("SELECT * FROM Users WHERE email = %s", (email,))
+        if cursor.fetchone():
+            flash("Email already exists. Please use a different email.", "danger")
+            conn.close()
+            return redirect(url_for('add_user'))
+
+        # Handle member role validations
         if role == 'member':
-            address = request.form['address']
-            dob = request.form['dob']
+            address = request.form.get('address', '').strip()
+            dob = request.form.get('dob', '').strip()
 
-            # Insert into Users table
-            conn = get_db_connection()
-            cursor = conn.cursor()
+            # Validate required member fields
+            if not address:
+                flash("Address is required for members.", "danger")
+                conn.close()
+                return redirect(url_for('add_user'))
+            if not dob:
+                flash("Date of Birth is required for members.", "danger")
+                conn.close()
+                return redirect(url_for('add_user'))
+
+            # Insert user and member data
             cursor.execute(
                 "INSERT INTO Users (name, email, role) VALUES (%s, %s, %s)",
                 (name_full, email, role)
             )
             conn.commit()
 
-            # Get the newly inserted user's ID
             cursor.execute("SELECT user_id FROM Users WHERE email = %s", (email,))
             user_id = cursor.fetchone()['user_id']
 
-            # Insert into Members table
             cursor.execute("""
                 INSERT INTO Members (user_id, name_full, address, date_of_birth)
                 VALUES (%s, %s, %s, %s)
-            """, (user_id, name_full, address, dob))  # Including address and dob
+            """, (user_id, name_full, address, dob))
             conn.commit()
             conn.close()
 
-            flash("User added successfully!", 'success')
-            return redirect(url_for('list_users'))  # Redirect to the users list
-        
-        # Handle the 'trainer' role case
+            flash("Member added successfully!", 'success')
+            return redirect(url_for('list_users'))
+
+        # Handle trainer role validations
         elif role == 'trainer':
-           
-            specialization = request.form['specialization']
-            experience = request.form['experience']
-            bio = request.form.get('bio')  # Use .get() to handle missing data gracefully
-
-            image = request.files.get('image')  # Get the uploaded image (if any)
+            specialization = request.form.get('specialization', '').strip()
+            experience = request.form.get('experience', '').strip()
+            bio = request.form.get('bio', '').strip()
+            image = request.files.get('image')
             image_filename = None
-        if image and allowed_file(image.filename):
-            image_filename = secure_filename(image.filename)
-            image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
-            image.save(image_path)  # Save the image to the server
 
-            # Insert into Users table for the trainer
-            conn = get_db_connection()
-            cursor = conn.cursor()
+            # Validate required trainer fields
+            if not specialization:
+                flash("Specialization is required for trainers.", "danger")
+                conn.close()
+                return redirect(url_for('add_user'))
+            if not experience:
+                flash("Experience is required for trainers.", "danger")
+                conn.close()
+                return redirect(url_for('add_user'))
+
+            if image and allowed_file(image.filename):
+                image_filename = secure_filename(image.filename)
+                image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
+                image.save(image_path)
+
             cursor.execute(
                 "INSERT INTO Users (name, email, role) VALUES (%s, %s, %s)",
                 (name_full, email, role)
             )
             conn.commit()
 
-            # Get the newly inserted user's ID
             cursor.execute("SELECT user_id FROM Users WHERE email = %s", (email,))
             user_id = cursor.fetchone()['user_id']
 
-            # Insert into Trainers table and update the image_url for trainers
             cursor.execute("""
-                INSERT INTO Trainers (user_id, trainer_name, specialization, experience,bio, image_url)
-                VALUES (%s, %s, %s, %s,%s, %s)
-            """, (user_id, name_full, specialization, experience, bio, image_filename))  # Store image_url in Trainers table
+                INSERT INTO Trainers (user_id, trainer_name, specialization, experience, bio, image_url)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (user_id, name_full, specialization, experience, bio, image_filename))
             conn.commit()
             conn.close()
 
             flash("Trainer added successfully!", 'success')
-            return redirect(url_for('list_users'))  # Redirect to the users list
+            return redirect(url_for('list_users'))
 
         else:
-            # Handle other roles such as 'trainer' (this part remains unchanged)
-            pass
+            flash("Invalid role selected.", "danger")
+            conn.close()
+            return redirect(url_for('add_user'))
 
     return render_template('add_user.html')
 
+
 @app.route('/users/edit/<int:user_id>', methods=['GET', 'POST'])
-def edit_user(user_id):
+def edit_user(user_id):  #edit user
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -194,7 +225,7 @@ def edit_user(user_id):
 
 # --- Delete User (and reflect in Members) ---
 @app.route('/users/delete/<int:user_id>', methods=['POST'])
-def delete_user(user_id):
+def delete_user(user_id): #delete user
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -223,7 +254,7 @@ def delete_user(user_id):
     return redirect(url_for('list_users'))  # Redirect back to the list of users
 
 @app.route('/members')
-def list_members():
+def list_members(): #list members
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -291,7 +322,7 @@ def add_member():
 
 
 @app.route('/members/edit/<int:member_id>', methods=['GET', 'POST'])
-def edit_member(member_id):
+def edit_member(member_id): #edit member
     conn = get_db_connection()
     cursor = conn.cursor()
 
